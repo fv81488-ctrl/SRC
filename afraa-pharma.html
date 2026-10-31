@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Afraa Pharma</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--tx:#14213d;--mu:#64748b;--ac:#0f8b8d;--bd:#dbe3ee;--ok:#16a34a;--no:#dc2626;--okb:#dcfce7;--nob:#fee2e2;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1220;--card:#131c2e;--tx:#e6edf7;--mu:#8fa0b8;--ac:#2dd4bf;--bd:#24324a;--okb:#0f3a25;--nob:#4a1818;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b1220;--card:#131c2e;--tx:#e6edf7;--mu:#8fa0b8;--ac:#2dd4bf;--bd:#24324a;--okb:#0f3a25;--nob:#4a1818;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+.w{max-width:760px;margin:0 auto;padding:16px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+h1{font-size:1.5rem;margin:0}h1 span{color:var(--ac)}
+.sub{color:var(--mu);font-size:.85rem}
+button{font:inherit;color:inherit;cursor:pointer}
+.ic{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:6px 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.sys{text-align:left;background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+.sys:hover{border-color:var(--ac)}.sys b{display:block}.sys small{color:var(--mu)}
+.st{display:flex;gap:10px;margin-bottom:12px}.st div{flex:1;text-align:center;background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px}.st b{font-size:1.3rem;color:var(--ac);display:block}
+.bar{height:6px;background:var(--bd);border-radius:9px;overflow:hidden;margin:8px 0 14px}.bar i{display:block;height:100%;background:var(--ac)}
+.tag{display:inline-block;font-size:.75rem;color:var(--ac);border:1px solid var(--ac);border-radius:99px;padding:1px 10px;margin-bottom:8px}
+.q{font-size:1.1rem;font-weight:600;margin:0 0 12px}
+.o{display:block;width:100%;text-align:left;background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.o:not(:disabled):hover{border-color:var(--ac)}.o.ok{background:var(--okb);border-color:var(--ok)}.o.no{background:var(--nob);border-color:var(--no)}
+.pr{background:var(--ac);color:#04201f;border:0;border-radius:10px;padding:10px 18px;font-weight:700}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.big{font-size:3rem;font-weight:800;color:var(--ac);text-align:center}
+.hi{font-size:.9rem;border-bottom:1px solid var(--bd);padding:8px 0}.hi:last-child{border:0}
+.hi em{color:var(--ok);font-style:normal}
+</style></head><body><div class="w" id="app"></div>
+<script>
+const T=`
+GEN|Which correctly matches a drug naming category?|Paracetamol – chemical name;N-acetyl-p-aminophenol – trade name;Tylenol – generic name;Acetaminophen – generic name|3
+GEN|Which therapy-related factor most likely reduces patient compliance?|Once-daily dosing;Fixed-dose combination pills;Complex regimens with multiple daily doses;Clear labeling and pictures on packaging|2
+GEN|Which best describes the placebo effect?|Therapeutic benefit from an inert substance (psychological);Pharmacological effect of an active ingredient;Drug–receptor interaction giving a response;Toxic effect unrelated to the intended action|0
+GEN|Which key factor makes a drug suitable for over-the-counter (OTC) use?|Complex dosing schedule;Specific medical testing before use;Simple, clear dosing instructions easily followed by the patient;Regular monitoring by a healthcare provider|2
+GEN|How much dextrose is in a 500 mL bag of 10% dextrose?|50 mg;500 g;50 g;5000 mg|2
+ANS|Which ion triggers ACh release from vesicles?|Sodium (Na⁺);Calcium (Ca²⁺);Potassium (K⁺);Magnesium (Mg²⁺)|1
+ANS|Which is a direct-acting cholinergic agonist?|Scopolamine;Neostigmine;Carbachol;Edrophonium|2
+ANS|Which is a reversible acetylcholinesterase inhibitor?|Sarin;Physostigmine;Atropine;Epinephrine|1
+ANS|Which drug reactivates acetylcholinesterase in organophosphate poisoning?|Pilocarpine;Pralidoxime;Atropine;Neostigmine|1
+ANS|What is the primary use of scopolamine?|Parkinson’s disease;Motion sickness;Glaucoma;Hypertension|1
+ANS|Which can facilitate endotracheal intubation?|Succinylcholine;Atropine;Pilocarpine;Bethanechol|0
+ANS|Which is a mixed-acting adrenergic agonist?|Dopamine;Ephedrine;Dobutamine;Clonidine|1
+ANS|A common side effect of beta-agonists like albuterol is:|Bradycardia;Hypotension;Tremor;Miosis|2
+ANS|Which enzyme plays a major role in breakdown of norepinephrine?|COMT;Acetylcholinesterase;Cytochrome P450;Glutathione transferase|0
+ANS|Which statement about beta blockers is true?|They increase renin secretion;They reduce myocardial oxygen demand;They cause reflex tachycardia;They stimulate beta-2 receptors|1
+ANS|Which is a selective beta-1 blocker?|Propranolol;Atenolol;Carvedilol;Labetalol|1
+PAIN|Primary mechanism of action of NSAIDs?|Inhibit COX enzymes → ↓ prostaglandin synthesis;Inhibit phospholipase A2;Directly inhibit IL-1 and TNF;Inhibit endothelial nitric oxide production|0
+PAIN|Paracetamol reduces pain and fever primarily by:|Peripheral COX-1/COX-2 inhibition;Inhibiting COX in the CNS, especially the hypothalamus;Suppressing mast-cell histamine release;Blocking peripheral prostaglandins and leukotrienes|1
+PAIN|Corticosteroids exert anti-inflammatory effects by:|Blocking COX-1 and COX-2;Increasing cytokine production;Inhibiting phospholipase A2;Inhibiting CNS cyclooxygenase|2
+PAIN|Which side effect is associated with corticosteroids but NOT NSAIDs?|GI bleeding;Hepatotoxicity;Immunosuppression;Renal toxicity|2
+PAIN|Which is TRUE regarding COX-1 and COX-2 inhibition?|COX-2 inhibition reduces gastric protective PGs;COX-2 inhibition reduces renal protective PGs;COX-1 mediates inflammation; COX-2 mediates gastric protection;COX-2 mainly reduces inflammatory PGs; COX-1 has no major role in inflammation|3
+PAIN|Which side effect is most associated with COX-1 inhibition?|Heart attacks and stroke;GI ulcers and bleeding;Increased inflammation;Increased cardiovascular events|1
+PAIN|Which NSAID is most associated with increased cardiovascular risk (MI, stroke)?|Ibuprofen;Aspirin;Celecoxib;Diclofenac|2
+RESP|Primary mechanism of dextromethorphan?|Peripheral inhibition of cough reflex;H1 histamine blockade;Inhibits cough reflex in the medulla;Increases mucociliary clearance|2
+RESP|Common side effect of dextromethorphan as a cough suppressant?|Drowsiness;Sedation and respiratory depression;GI irritation;Dry mouth and urinary retention|0
+RESP|Benzonatate (non-opioid antitussive) works by:|Inhibiting the cough reflex in the medulla;Anesthetic action on lung stretch receptors;Suppressing mast-cell histamine release;Stimulating mucus production|1
+RESP|Which PDE-4 inhibitor reduces exacerbations in severe COPD?|Roflumilast;Salmeterol;Ipratropium;Fluticasone|0
+RESP|Which mast cell stabilizer prevents exercise-induced bronchospasm?|Cromolyn;Beclometasone;Albuterol;Tiotropium|0
+RESP|Which side effect can occur with SABAs like albuterol?|Hyperkalemia;Hyperglycemia;Bronchospasm;Hypotension|1
+RESP|Common side effect of theophylline?|Diarrhea;Tachycardia and arrhythmias;Hypertension;Edema|1
+ANS|Primary function of adrenergic agonists?|Block adrenergic receptors;Mimic norepinephrine and epinephrine;Inhibit sympathetic activity;Reduce heart rate|1
+ANS|Which is NOT an adrenergic receptor type?|Alpha-1;Beta-2;M2;Alpha-2|2
+ANS|Beta-2 receptors are mainly found in:|Lungs;Blood vessels;Heart and kidneys;Skeletal muscles|0
+ANS|Which is a direct-acting adrenergic agonist?|Albuterol;Amphetamine;Cocaine;Reserpine|0
+ANS|Indirect-acting adrenergic agonists work by:|Directly stimulating receptors;Blocking receptors;Increasing NE release or inhibiting its reuptake;Enhancing serotonin production|2
+ANS|Epinephrine is used in emergency medicine for:|Bradycardia;Anaphylaxis;Hypertension;Migraine|1
+ANS|Albuterol commonly causes:|Bradycardia;Hypotension;Tachycardia;Miosis|2
+ANS|Prolonged use of adrenergic agonists can lead to:|Decreased receptor sensitivity;Increased intestinal motility;Lower blood pressure;Sedation|0
+ANS|Terbutaline is used in obstetrics to:|Reduce labor pain;Stop preterm labor;Induce labor;Lower blood pressure|1
+ANS|Which enzyme metabolizes catecholamines?|Acetylcholinesterase;Monoamine oxidase (MAO);Peptidase;Glucuronyl transferase|1
+ANS|Beta-agonists increase:|cAMP levels;Calcium levels;Potassium efflux;Sodium reuptake|0
+ANS|Primary action of cholinergic antagonists?|Inhibit ACh release;Block muscarinic or nicotinic receptors;Increase cholinergic transmission;Enhance parasympathetic activity|1
+ANS|Stimulation of alpha-2 receptors leads to:|Increased NE release;Inhibition of NE release;Bronchoconstriction;Increased insulin secretion|1
+ANS|Beta-2 agonists are commonly used for:|Hypertension;Asthma and COPD;Raising blood glucose;Reducing heart rate|1
+ANS|Albuterol is a selective:|Alpha-1 agonist;Beta-1 agonist;Beta-2 agonist;Mixed alpha/beta agonist|2
+ANS|Which drug is used in cardiac arrest and anaphylactic shock?|Norepinephrine;Epinephrine;Clonidine;Terbutaline|1
+ANS|Primary function of adrenergic antagonists?|Stimulate adrenergic receptors;Block adrenergic receptor activity;Enhance neurotransmitter release;Inhibit cholinergic receptors|1
+ANS|Which subtype is primarily responsible for vasoconstriction?|Alpha-1;Alpha-2;Beta-1;Beta-2|0
+ANS|Which is a selective alpha-1 antagonist?|Phentolamine;Prazosin;Yohimbine;Propranolol|1
+ANS|Which antagonist reverses local anesthetic-induced vasoconstriction?|Phentolamine;Prazosin;Metoprolol;Carvedilol|0
+ANS|Which is a selective beta-1 blocker?|Propranolol;Carvedilol;Bisoprolol;Labetalol|2
+ANS|Which is a non-selective beta-blocker with no alpha activity?|Propranolol;Carvedilol;Bisoprolol;Labetalol|0
+ANS|Primary effect of alpha-1 antagonists on blood pressure?|Vasoconstriction;Vasodilation;Increased heart rate;Increased contractility|1
+ANS|Which antagonist is preferred in hypertensive emergencies of pregnancy?|Propranolol;Labetalol;Metoprolol;Prazosin|1
+ANS|Pheochromocytoma should be treated first with:|Beta blockers;Alpha blockers;Calcium channel blockers;ACE inhibitors|1
+ANS|Propranolol is used in the management of:|Essential tremor;Hyperthyroidism;Migraine prophylaxis;All of the above|3
+ANS|Which statement about beta blockers is true?|They increase renin secretion;They reduce myocardial oxygen demand;They cause reflex tachycardia;They stimulate beta-2 receptors|1
+ANS|Non-selective beta blockers can worsen:|Hypertension;COPD;Cardiac output;Hypotension|1
+ANS|Beta blockers are contraindicated in:|Hypertension;AV block;Hyperthyroidism;Glaucoma|1
+ANS|Which beta blocker is preferred in heart failure?|Propranolol;Carvedilol;Atenolol;Nadolol|1
+TOX|Primary purpose of the “coma cocktail” in altered mental status?|Induce vomiting;Correct hypoglycemia, reverse opioid toxicity, prevent Wernicke encephalopathy;Gastric lavage;Give activated charcoal|1
+TOX|Which toxin is NOT effectively bound by activated charcoal?|Aspirin;Iron;Theophylline;Phenobarbital|1
+TOX|Which is a classic dialyzable toxin (“I STUMBLE”)?|Acetaminophen;Lithium;Lead;Benzodiazepines|1
+TOX|Antidote of choice for acetaminophen poisoning?|Naloxone;N-acetylcysteine (NAC);Deferoxamine;Flumazenil|1
+TOX|Which phase of acetaminophen toxicity shows liver necrosis and jaundice?|Phase 1;Phase 2;Phase 3;Phase 4|2
+TOX|Fomepizole treats methanol toxicity by:|Chelating iron;Inhibiting alcohol dehydrogenase;Reactivating acetylcholinesterase;Binding cyanide|1
+TOX|Toxic metabolite of ethylene glycol?|Formic acid;Oxalic acid;Acetone;Formaldehyde|1
+TOX|Carbon monoxide poisoning is best initially managed with:|Activated charcoal;100% oxygen;Naloxone;Sodium bicarbonate|1
+TOX|Preferred antidote for cyanide poisoning?|Sodium nitrite;Hydroxocobalamin;Atropine;Methylene blue|1
+TOX|Common source of lead poisoning?|Antifreeze;Old paint;Windshield fluid;Aspirin|1
+TOX|Classic triad of opioid toxicity?|Hypertension, tachycardia, hyperthermia;CNS depression, respiratory depression, pinpoint pupils;Diarrhea, urination, miosis;Agitation, hyperreflexia, clonus|1
+TOX|Antidote for iron poisoning?|Deferoxamine;Naloxone;Physostigmine;Flumazenil|0
+TOX|Organophosphate poisoning is characterized by:|Dry skin, flushed face, delirium;Salivation, lacrimation, urination, diarrhea;Hyperreflexia, clonus, hyperthermia;Lead-pipe rigidity, autonomic instability|1
+TOX|Which is a nicotinic sign of cholinergic toxicity?|Bradycardia;Fasciculations;Miosis;Bronchorrhea|1
+TOX|Antidote for benzodiazepine overdose?|Naloxone;Flumazenil;Physostigmine;Atropine|1
+TOX|“Dry as a bone, red as a beet, mad as a hatter” describes:|Sympathomimetic;Cholinergic;Anticholinergic;Serotonin syndrome|2
+TOX|Serotonin syndrome is distinguished by:|Lead-pipe rigidity and slow onset;Hyperreflexia, clonus and rapid onset;Pinpoint pupils and respiratory depression;Dry skin and urinary retention|1
+TOX|Neuroleptic malignant syndrome is triggered by:|Serotonin agonists;Dopamine antagonists;Opioids;Benzodiazepines|1
+TOX|Which treats malignant hyperthermia?|Bromocriptine;Dantrolene;Cyproheptadine;Physostigmine|1
+TOX|Urinary alkalinization enhances elimination of:|Iron;Salicylates;Lead;Opioids|1
+TOX|Contraindication to flumazenil?|Opioid overdose;Chronic benzodiazepine use;Acetaminophen overdose;Iron poisoning|1
+TOX|Which toxin causes metabolic acidosis WITHOUT anion gap (per key)?|Methanol;Ethylene glycol;Isopropanol;Salicylates|2
+TOX|Primary mechanism of toxicity in carbon monoxide poisoning?|Inhibition of cytochrome oxidase;Formation of carboxyhemoglobin;Glutathione depletion;Uncoupling of oxidative phosphorylation|1
+TOX|Key feature of anticholinergic toxidrome?|Sweating;Miosis;Bradycardia;Urinary retention|3
+TOX|Antidote for methemoglobinemia?|Methylene blue;Naloxone;Deferoxamine;Hydroxocobalamin|0
+TOX|First step in managing any poisoned patient?|Give antidote;Ensure airway, breathing, circulation;Gastric lavage;Give activated charcoal|1
+TOX|Common symptom of lead poisoning in children?|Cherry-red skin;Increased IQ;Microcytic hypochromic anemia;Metabolic alkalosis|2
+TOX|Which toxin is radiopaque on abdominal X-ray?|Acetaminophen;Iron;Ethylene glycol;Salicylates|1
+TOX|Which is a muscarinic sign of cholinergic toxicity?|Hypertension;Tachycardia;Miosis;Fasciculations|2
+TOX|Goal of sodium bicarbonate in tricyclic antidepressant overdose?|Alkalinize urine;Correct metabolic acidosis;Stabilize cardiac membranes;Enhance dialysis elimination|2
+#|GEN|Pharmacokinetics (Midterm)|First-pass metabolism;Volume of distribution;Clearance;Zero-order kinetics;First-order kinetics;Protein binding;Steady state
+-|A man with liver cirrhosis: oral drugs metabolised before reaching circulation are avoided as levels become unpredictable. What is altered?|0
+-|An antidepressant taken once daily takes ~5 days to reach a stable, consistent level. What is this called?|6
+-|A woman with renal failure has prolonged effects from a renally-excreted drug. What is impaired?|2
+-|Phenytoin overdose: a constant amount of drug is eliminated per unit time. This elimination is:|3
+#|ANS|ANS Receptors and Locations (Midterm)|Alpha-1;Alpha-2;Beta-1;Beta-2;Muscarinic M2;Muscarinic M3;Nicotinic Nn (neuronal);Nicotinic Nm (muscle);Dopamine D1;Muscarinic M1
+-|Peripheral vascular smooth muscle constricts to sympathetic stimulation, raising BP.|0
+-|SA node slows its firing rate with vagal stimulation.|4
+-|Postganglionic neurons receive fast excitatory input from preganglionic fibres.|6
+-|Bronchial smooth muscle relaxes with sympathetic stimulation (bronchodilation).|3
+#|ANS|Receptors and Signal Transduction (Midterm)|Alpha-1 adrenergic;Alpha-2 adrenergic;Beta-1 adrenergic;M2 receptors;Nicotinic receptors
+-|This receptor is a ligand-gated ion channel.|4
+-|Found on preganglionic neurons of both sympathetic and parasympathetic NS; a Gi-coupled GPCR.|1
+-|Effector is phospholipase C; second messengers are IP3 and DAG.|0
+-|Found in the heart; activation decreases cAMP.|3
+#|RESP|Asthma Medications (Midterm)|SABA;Inhaled corticosteroid (ICS);LABA;Leukotriene receptor antagonist;Oral corticosteroids;Anti-IgE monoclonal;Muscarinic antagonist (ipratropium);Theophylline;Magnesium sulfate;Anti-IL-5 biologic (mepolizumab)
+-|A woman with intermittent asthma (symptoms twice weekly) needs rapid relief: first-line therapy.|0
+-|A boy with moderate persistent asthma has daily symptoms despite low-dose ICS; a longer-acting controller is added.|2
+-|A woman with mild persistent asthma uses salbutamol often; a daily controller is prescribed to reduce airway inflammation.|1
+-|A COPD exacerbation: nebulised salbutamol plus a bronchodilator that inhibits parasympathetic tone.|6
+#|GU|Glaucoma Medications (Midterm)|Timolol;Latanoprost;Acetazolamide;Pilocarpine;Brimonidine
+-|POAG treated first-line with a topical beta-blocker.|0
+-|POAG treated with a prostaglandin analogue.|1
+-|Acute closed-angle glaucoma: carbonic anhydrase inhibitor to reduce aqueous production.|2
+-|POAG treated with a miotic that increases trabecular outflow (night-vision problems, pupil constriction).|3
+#|GEN|Pharmacodynamics (Revision)|Agonist;Partial agonist;Competitive antagonist;Non-competitive antagonist;Potency;Efficacy;Therapeutic index;Tachyphylaxis;Desensitization;Affinity
+-|Chronic asthma: a regularly used beta-2 agonist becomes less effective; higher doses are needed.|8
+-|A new drug binds the morphine receptor but activates it less, giving milder analgesia.|1
+-|A drug blocks an agonist, but increasing the agonist dose overcomes the block.|2
+-|Drug A gives the same maximal effect as Drug B but at a much lower dose.|4
+-|A drug completely suppresses the agonist’s maximal response even at high agonist concentration.|3
+#|GEN|Receptors (Revision)|G-protein-coupled receptor;Ligand-gated ion channel;Tyrosine kinase receptor;Nuclear receptor;Downregulation;Upregulation;Spare receptors;Receptor desensitization;Inverse agonist;Allosteric modulator
+-|Insulin binds a receptor that triggers intracellular phosphorylation cascades.|2
+-|A drug binds a receptor but causes the opposite effect of the natural ligand.|8
+-|Continuous beta-2 agonist stimulation reduces receptor numbers on the cell surface.|4
+-|Nicotinic ACh receptors open rapidly on binding, allowing Na⁺ influx.|1
+-|A drug class enhances GABA’s effect without directly activating its receptor.|9
+#|GEN|Pharmacokinetics (Revision)|Enterohepatic circulation;Protein binding;Steady state;Therapeutic drug monitoring;Renal excretion;Hepatic metabolism;pH-dependent reabsorption;Extraction ratio (first-pass);Peak plasma concentration;First-order elimination
+-|A drug is conjugated in the liver, excreted in bile, then reabsorbed from the intestine, prolonging half-life.|0
+-|A lipophilic drug is 95% bound to albumin, limiting free active drug.|1
+-|An oral drug only partly reaches systemic circulation due to hepatic metabolism before the bloodstream (first-pass).|7
+-|An antibiotic needs regular blood tests to adjust dosing and avoid toxicity.|3
+-|A weak base is excreted better in acidic urine due to reduced tubular reabsorption.|6
+#|RESP|Asthma Medications (Revision)|Salbutamol (SABA);Salmeterol (LABA);Beclomethasone (ICS);Montelukast (LTRA);Ipratropium (SAMA);Tiotropium (LAMA);Theophylline;Omalizumab (anti-IgE);Prednisolone (oral steroid);Magnesium sulphate (IV)
+-|Moderate persistent asthma, uses salbutamol several times weekly: start a daily anti-inflammatory controller.|2
+-|Life-threatening asthma, hypoxic despite salbutamol, ipratropium, O₂ and IV steroids: second-line IV smooth-muscle relaxant.|9
+-|Severe exacerbation admitted: high-dose systemic corticosteroids.|8
+-|Uncontrolled asthma on ICS/LABA with elevated serum IgE and frequent exacerbations.|7
+-|Elderly man with COPD/asthma overlap: once-daily inhaled bronchodilator.|5
+#|GU|Urinary Incontinence (Revision)|Oxybutynin;Mirabegron;Duloxetine;Solifenacin;Tolterodine;Bethanechol;Tamsulosin;Prazosin;Desmopressin;Phenylephrine
+-|Overactive bladder: a beta-3 agonist that relaxes the bladder without anticholinergic effects.|1
+-|BPH with hesitancy and weak stream: selective alpha-1 blocker.|6
+-|Urge incontinence: antimuscarinic blocking M3 receptors (key accepts any antimuscarinic; Solifenacin D also correct).|0
+-|Postpartum urinary retention: muscarinic agonist to stimulate detrusor contraction.|5
+
+PATHM|A 54-year old female presents with fatigue and xerostomia.Blood stests reveal the following: Hb 13.9g/dl WBC 6.1*109/l Platelets 246*109/l Bilirubin 33µmol/l ALP 292u/l ALT 47u/l What is themost likely diagnosis?|Systemic lupus erythematous;Infectious mononucleosis;Primary biliary cirrhosis;Autoimmune hepatitis;Sjogren's syndrome|2|Majid - GI and Liver
+PATHM|A 25-year-old man presents with lethargy and increased skin pigmentation. Blood test reveal deranged liver function tests and impaired glucose tolerance. Given the likely diagnosis of haemochromatosis, what is the most appropriate initial investigation strategy?|Transferrin saturation + ferritin;Haematocrit + ferritin;Liver biopsy with Perl's stain;Serum iron + ferritin;Serum iron + haematocrit|0|Majid - GI and Liver
+PATHM|A 31-year-old man with a known history of alcoholic liver disease is reviewed following a suspected oesophageal variceal haemorrhage. He has been resuscitated and intravenous terlipressin has been given. His blood pressure is now 104/60 mmHg and his pulse is 84/min. What is the most appropriate intervention?|Transjugular Intrahepatic Portosystemic Shunt;Surgical referral;Endoscopic variceal band ligation;Sengstaken-Blakemore tube;Endoscopic sclerotherapy|2|Majid - GI and Liver
+PATHM|A 22-year-old male blood donor is noted to have the following blood results: Bilirubin 41 µmol/L ALP 84 U/L ALT 23 U/L Albumin 41 g/L Dipstick urinalysis No bilirubinuria He has recently complained of coryzal symptoms and a non-productive cough. What is the most likely diagnosis?|Gilbert's syndrome;Dubin-Johnson syndrome;Rotor syndrome;Hepatitis C infection;Infectious mononucleosis|0|Majid - GI and Liver
+PATHM|A 54-year-old man with a long history of heartburn has an endoscopy to investigate his symptoms. A biopsy is taken from an abnormal area of mucosa in the lower oesophagus and reported as follows: Non-dysplastic columnar- lined oesophagus. What is the most suitable management?|Reassure and discharge;Fundoplication;Laser ablation;Ivor-Lewis oesophagectomy;High-dose proton pump inhibitor and follow- up|4|Majid - GI and Liver
+PATHM|A 49-year-old female is referred to the gastroenterology out-patient clinic with a 3 month history of epigastric pain and diarrhoea. Her GP initially prescribed lansoprazole 30mg od but this didn't alleviate her symptoms. The only past medical history of note is hyperparathyroidism. Endoscopy revealed multiple duodenal ulcerations. What is the likely diagnosis?|Multiple endocrine neoplasia type II a;Coeliac disease;Multiple endocrine neoplasia type I;Autoimmune polyendocrinopathy syndrome;Crohn's disease|2|Majid - GI and Liver
+PATHM|A 43-year-old man presents with diarrhoea and rectal bleeding for the past five days. On examination he has brown pigmented lesions on his lips and palms but abdominal and rectal examination is unremarkable. What is the most likely cause for this presentation?|Intussusception;Angiodysplasia;Meckel's Diverticulum;Colon cancer;Diverticular abscess|0|Majid - GI and Liver
+PATHM|A 54-year-old female presents with a 3 month history of dysphagia affecting both food and liquids from the start, along with occasional symptoms of heartburn. What is the most likely underlying diagnosis?|Pharyngeal pouch;Gastric adenocarcinoma;Benign stricture;Oesophageal cancer;Achalasia|4|Majid - GI and Liver
+PATHM|A 46-year-old man is being investigated for indigestion. Jejunal biopsy shows deposition of macrophages containing PAS-positive granules. What is the most likely diagnosis?|Bacterial overgrowth;Coeliac disease;Tropical sprue;Whipple's disease;Small bowel lymphoma|3|Majid - GI and Liver
+PATHM|Which one of the following is most suggestive of Wilson's disease?|Reduced hepatic copper concentration;Reduced 24hr urinary copper excretion;Increased skin pigmentation;Reduced serum caeruloplasmin;Reduced serum copper|3|Majid - GI and Liver
+PATHM|Primary sclerosing cholangitis is most associated with:|Primary biliary cirrhosis;Crohn's disease;Hepatitis C infection;Ulcerative colitis;Coeliac disease|3|Majid - GI and Liver
+PATHM|Which one of the following is most associated with the development of acute pancreatitis?|Hyperchylomicronaemia;Amyloidosis;Hypogammaglobulinaemia;Hypercholesterolaemia;Hypotriglyceridaemia|0|Majid - GI and Liver
+PATHM|A 23-year-old man develops watery diarrhoea 5 days after arriving in Mexico. Which one of the following is the most likely responsible organism?|Salmonella;Shigella;Campylobacter;Escherichia coli;Bacillus cereus|3|Majid - GI and Liver
+PATHM|A 34-year-old HIV positive man is referred to gastroenterology due to jaundiced sclera. Liver function tests are as follows: Albumin 34 g/l ALP 540 iu/l Bilirubin 67 µmol/l ALT 45 iu/l What is the most likely diagnosis?|Hepatic abscess;Fungal obstruction of the bile duct;Duodenal adenoma;Primary biliary cirrhosis;Sclerosing cholangitis|4|Majid - GI and Liver
+PATHM|Which of the following is a non-organ-specific (systemic) autoimmune disease:|Myasthenia gravis.;Systemic lupus erythematosus (SLE).;Hashimoto's thyroiditis.;Pernicious anemia.;Insulin-dependent diabetes mellitus|1|Fatima - Immunology and Autoimmunity
+PATHM|Which of the following antibodies are of most use for the diagnosis of pernicious anemia:|Anti-parietal cell.;Anti-thyroid peroxidase.;Anti-nuclear.;Anti-IgG Fc;Anti-TSH receptor|0|Fatima - Immunology and Autoimmunity
+PATHM|Which of the following antibodies are useful for the diagnosis of Sjögren's syndrome:|Anti-cardiolipin.;Anti-neutrophil cytoplasm (ANCA).;Anti-SS-A(Ro), anti-SS-B(La).;Anti-21-hydroxylase.;Anti-glomerular basement membrane.|2|Fatima - Immunology and Autoimmunity
+PATHM|The disease most frequently seen in association with pernicious anemia is:|Addison's disease of the adrenal.;Multiple sclerosis.;Autoimmune hemolytic anemia.;Rheumatoid arthritis.;Graves' disease|4|Fatima - Immunology and Autoimmunity
+PATHM|HLA-DR2 is a risk factor for:|Multiple sclerosis.;Insulin-dependent (type I) diabetes.;Ankylosing spondylitis.;Rheumatoid arthritis.;Myasthenia gravis|0|Fatima - Immunology and Autoimmunity
+PATHM|Which of the following is incorrect 'Natural antibodies' are often:|Autoreactive.;Polyspecific.;Reactive with bacterial carbohydrates.;High affinity IgG.;Produced by CD5+ B-cells|3|Fatima - Immunology and Autoimmunity
+PATHM|Which of the following is incorrect: T-helpers can be bypassed by:|Failure of regulatory T-cells.;Polyclonal activation of B-cells.;Idiotypic mechanisms.;Antigenic cross-reaction.;T-cell recognition of carrier complexed to autoantigen|0|Fatima - Immunology and Autoimmunity
+PATHM|The antiphospholipid syndrome is associated with:|Infertility.;Severe anemia.;Wegener's granulomatosis.;Raised platelet levels.;Recurrent fetal loss|4|Fatima - Immunology and Autoimmunity
+PATHM|Exophthalmos is often associated with:|Hashimoto's disease.;Primary myxedema.;Graves' disease.;Idiopathic thrombocytopenic purpura.;Autoimmune hemolytic anemia|2|Fatima - Immunology and Autoimmunity
+PATHM|In celiac disease there is T-cell sensitivity to:|Vitamin B12.;Gluten.;b-adrenergic receptors.;Gastric H+-K+ dependent ATPase.;Myelin basic protein|1|Fatima - Immunology and Autoimmunity
+PATHM|In type 1 diabetes (insulin-dependent diabetes mellitus), the target of the autoimmune attack is:|All of the cells in the islets of Langerhans.;The b-cells in the islets of Langerhans.;The somatostatin-producing cells in the islets of Langerhans.;The glucagon-producing cells in the islets of Langerhans.;Cells throughout the body which have an insulin receptor|1|Fatima - Immunology and Autoimmunity
+PATHM|Pernicious anemia can be treated with:|Thyroxine.;Insulin.;Vitamin B12.;Thymectomy.;Acetylcholine esterase inhibitors|2|Fatima - Immunology and Autoimmunity
+PATHM|Which of the following factors has not been associated with the development of autoimmune disease:|Sex.;HLA.;Genetic factors other than HLA.;Infection.;SCID|4|Fatima - Immunology and Autoimmunity
+PATHM|Which of the following responses is incorrect. Autoimmunity can arise when:|Exogenous antigens cross-react with self- antigen.;Exogenous antigens cross-react with self- idiotypes.;B-cells are stimulated with polyclonal activators.;Regulatory T-cells are stimulated.;Cytokine imbalance occurs|3|Fatima - Immunology and Autoimmunity
+PATHM|A difference between organ-specific and nonorgan-specific autoimmune disorders is that:|Only in organ-specific autoimmune disorders is there a greater incidence in women.;Associations with HLA are only seen in nonorgan-specific autoimmunity.;Circulating autoantibodies react with normal body components only in organ-specific autoimmune disorders.;It is only in organ-specific autoimmune disorders that autoantibody tests are of diagnostic value.;Only in nonorgan-specific autoimmune diseases are anti-nuclear antibodies a frequent feature.|4|Fatima - Immunology and Autoimmunity
+PATHM|Ankylosing spondylitis is strongly associated with HLA-:|B8.;DR3.;DR4.;B27.;DR2|3|Fatima - Immunology and Autoimmunity
+PATHM|bleeding joints is a characteristic feature of :|vitamin c deficiency;hemophilia;vitamin k deficiency;thrombocytopenia|1|Fatima 2 - Haemostasis
+PATHM|deficiency of all the three components of coagulation factor VIII results in :|von willebrands disease;hemophilia A;parahemophilia;hemophilia B|0|Fatima 2 - Haemostasis
+PATHM|Which of the following is seen in idiopathic thrombocytopenic purpura :|thrombocytosis;increased prothrombin time;increased bleeding time;increased clotting time|2|Fatima 2 - Haemostasis
+PATHM|Which of the following is not a finding in hemophilia A :|bleeding into soft tissues, muscles, and joints;decreased factor VIII;increased prothrombin time;increased partial thromboplastin time|2|Fatima 2 - Haemostasis
+PATHM|Christmas disease is due to deficiency of :|Hageman factor;platelets;plasma thromboplastin antecedent;plasma thromboplastin component|3|Fatima 2 - Haemostasis
+PATHM|All of the following statements about idiopathic thrombocytopenic purpura are true except :|it's associated with platelet specific auto antibodies;it causes a prolonged bleeding time;it is often controllable by immunosuppressive treatment;it causes more prolonged hemorrhage than hemophilia|3|Fatima 2 - Haemostasis
+PATHM|All of following are left to right shunt except :|ASD;VSD;PDA;HTN;TOF|4|Lama - Cardiovascular and Respiratory
+PATHM|Esiemenger syndrome (reverse shunt) is due to :|heart failure;diabetes malitus;pulmonary hypertension;renal failure;systematic hypertension|2|Lama - Cardiovascular and Respiratory
+PATHM|Onion skin appearance are seen on:|smoker;diabetic;hyperplastic arteriosclerosis;hyaline arteriosclerosis;heart failure|2|Lama - Cardiovascular and Respiratory
+PATHM|Hyperplastic arteriosclerosis is characteristically seen in:|essential hypertension;malignant hypertension;burger's disease;coarctation of aorta;polyarteritis nodosa|1|Lama - Cardiovascular and Respiratory
+PATHM|Which of the following types of secondary hypertension can treated surgically :|acute glomerulonephritis.;chronic renal disease;polyarteritis nodosa;renal artery stenosis;pregnant induced hypertension|3|Lama - Cardiovascular and Respiratory
+PATHM|Which of the following is most likely to develop in pt who has VSD when he becames 20y:|left atrial dilation;mitral prolapse;pulmonary hypertension;MI;cardiac tamponade|2|Lama - Cardiovascular and Respiratory
+PATHM|Hypertensive enlargement of the heart is a form of:|fatty infiltration;hypoplasia;glycogen storage;hypertrophy;hyperplasia|3|Lama - Cardiovascular and Respiratory
+PATHM|The pathology caused by benign hypertension in arterioles is|fibrinoid necrosis;hyaline necrosis;caloagulative necrosis;endothelial proliferation;thrombosis|1|Lama - Cardiovascular and Respiratory
+PATHM|On patient with large bowel carcinoma was developed infective endocarditis which organism are suspected to be the cause :|steptococcus virdans;staphylococcus aureus;candida;streptococcus bovis;staphylococcus epidermidis|3|Lama - Cardiovascular and Respiratory
+PATHM|Achoff bodies are presented on :|amyloidosis;myocarditis;lymphoma;rheumatic heart disease;infective endocarditis|3|Lama - Cardiovascular and Respiratory
+PATHM|Pleural effusion, pulmonary edema,S4 are a feature of:|rheumatic Fever;infective endocarditis;congestive HF;right HF;left HF|4|Lama - Cardiovascular and Respiratory
+PATHM|The most common cause of right HF is:|IHD;cor pulmonal;hypertension;Left heart failure;rheumatic heart disease|3|Lama - Cardiovascular and Respiratory
+PATHM|The most common cause of left HF is:|rheumatic heart disease;hypertension;infective endocarditis;IHD;Chronic kidney diseases|3|Lama - Cardiovascular and Respiratory
+PATHM|The organisms most associated with rheumatic fever:|alfa hemolytic streptocci;beta hemolytic streptocci;staphylococcus aureus;haemophilus influenzae;staphylococcus epidermis|1|Lama - Cardiovascular and Respiratory
+PATHM|Which of the following tests is most useful in the diagnosis of rheumatic fever:|ASO titer;acute phases reactants;chest X ray;both A &amp,B;both A&amp,C|3|Lama - Cardiovascular and Respiratory
+PATHM|Bronchiectasis may produce the following except :|hemoptysis;foal smelling sputum;episodic fever;bronchogenic carcinoma|3|Lama - Cardiovascular and Respiratory
+PATHM|A patient with kartagener's syndrome is at risk of developing :|adenocarcinoma of the lung;brochiectasis;lymphangietasis;pleural plaques;pneumocytosis carinii pneumonia|1|Lama - Cardiovascular and Respiratory
+PATHM|One of the following dose not predispose to the development of t.b|HLA B27;diabetes;asbestosis;malnutrition;alcoholism|0|Lama - Cardiovascular and Respiratory
+PATHM|Tuberculin test is|hyersensativity 1;hyersensativity2;hyersensativity3;hyersensativity4|3|Lama - Cardiovascular and Respiratory
+PATHM|Primary tuberculosis is chacterized by:|cavitation and fibrosis;majority of patients are asymptomatic;hilar lymph nodes are not affected;it is mainly disease of adult;mainly affect the apex of lung|1|Lama - Cardiovascular and Respiratory
+PATHM|Which of the following cells is the most important in the development of tuberculosis granuloma :|macrophages;fibroblast;neutrophils;mast cell;platelet|0|Lama - Cardiovascular and Respiratory
+PATHM|IN tuberculosis all true exept:|the primary comlex refers to the lesion in the lung and hilar lymph nodes.;millary tuberculosis is seen in the lung,liver,spleen, kidneys and meningitis.;a cold abscess is painful soft mass with caseous material.;2ry pulmonary tuberculosis affects the apex of the lung.;pleural effusion may occur.|2|Lama - Cardiovascular and Respiratory
+PATHM|the following are causes of right sided heart failure only except :|lung emphysema;tricuspid incompetence;mitral stenosis;constrictive pericarditis;mitral incompetence|4|Lama - Cardiovascular and Respiratory
+PATHM|the following diseases causes secondary hypertension except :|polycythemia;bronchiectasis;polyarteritis nodosa;chronic pyelonephritis;cushing syndrome|1|Lama - Cardiovascular and Respiratory
+PATHM|3 ] the following are true for atherosclerosis except :|common in aorta;disease of media;predispose to thrombosis;may cause fusiform aneurysm;hereditary nature suspected|1|Lama - Cardiovascular and Respiratory
+PATHM|which of the following is true about rheumatic fever :|irreversible brain damage is common;rheumatic arthritis mainly of small joints;irreversible damage to cardiac valves is a must;none of the above;all of the above|3|Lama - Cardiovascular and Respiratory
+PATHM|The myocardial infarction commonly affect:|lateral wall of lt ventricle.;posterior wall of lt ventricle.;anterior wall of Rt ventricle.;anterior wall of lt ventricle.;non of the above.|3|Lama - Cardiovascular and Respiratory
+PATHM|the following may be a feature of old Myocardial infarction except :|cardiac aneurysm.;elevation of cardiac enzymes;arrhythmia .;chronic heart failure.;pericardial adhesion.|1|Lama - Cardiovascular and Respiratory
+PATHM|which statement true about rheumatic fever :|it follow staphylococcal infection.;it most commonly start about the age of 25.;it may involve brain or joints causing irresistible damage.;the characters lesions are bodies composed of neutrophils and fibrin.;non of the above|4|Lama - Cardiovascular and Respiratory
+PATHM|which of the following conditions is not a complications of rheumatic fever:|mitral stenosis.;subacute infective endocarditis.;aortic incompetence.;perforation of aortic cusps;heart failure|3|Lama - Cardiovascular and Respiratory
+PATHM|all of the following are feature of subacute infective endocarditis except :|it commonly affect mitral and aortic valves.;it may by mesenteric and aortic aneurysm.;the kidneys may develop glomerulonephritis.;the affected cusp are commonly perforated;spleenomegaly may occur.|3|Lama - Cardiovascular and Respiratory
+PATHM|the following are caused of lt side heart failure except :|hypertension .;emphysema.;coronary disease.;mitral incompetence.;aortic stenosis.|1|Lama - Cardiovascular and Respiratory
+PATHM|A 48-year-old man complains of chest pain upon exertion. He had been well until 4 months previously, when he fi rst developed a chest discomfort while jogging. His symptoms have progressed to the point that he now develops chest pain after climbing a single fl ight of stairs. He has a history of diabetes controlled by diet and of 25 pack-years of cigarette smoking.His father and maternal grandfather both died of heart disease before the age of 60. On the 5th hospital day, the patient develops chest pain during periods of mild activity, which is minimally responsive to sublingual nitroglycerin. Results of laboratory studies include WBC of 8,100/μL, CK- MB of 4.5 ng/mL, and troponin-I of 0.5 ng/mL. Which of the following is the most likely diagnosis? (|Acute myocardial infarction (;Cardiac arrhythmia (;Dressler syndrome (;Pulmonary thromboembolism (;Unstable angina|4|Lama - Cardiovascular and Respiratory
+PATHM|A 50-year-old man with familial hyperlipidemia undergoes resection of an abdominal aneurysm. Signs of congestive heart failure develop shortly after surgery. Despite treatment, the patient becomes hypotensive and expires 2 days later. Autopsy reveals marked narrowing of coronary arteries, without thrombosis.Multiple foci of necrosis are found circumferentially around the inner walls of both ventricles. Which of the following is the most likely cause of congestive heart failure in this patient? (|Calcifi c aortic stenosis (;Dilated cardiomyopathy (;Rupture of papillary muscle (;Subendocardial myocardial infarction (;Transmural myocardial infarction|3|Lama - Cardiovascular and Respiratory
+PATHM|A 66-year-old woman collapses while shopping and expires suddenly of cardiac arrest. Her past medical history is significant for long- standing type 2 diabetes mellitus. Her relatives note that she had complained of chest heaviness and shortness of breath for the past 2 weeks. Sterile fibrinous pericarditis and pericardial effusion are observed at autopsy. What additional finding would be expected during autopsy of this patient? (|Endocardial fi broelastosis (;Marantic endocarditis (;Mitral valve prolapse (;Myocardial infarct (;Right ventricular hypertrophy|3|Lama - Cardiovascular and Respiratory
+PATHM|A 16-year-old girl, who arrived in the United States from Africa, comes to the hospital with chest pain and respiratory distress. On physical examination, the patient is short of breath, wheezing, and gasping for air. A prominent pansystolic heart murmur and a prominent third heart sound are heard on cardiac auscultation. An X-ray study of the chest shows marked enlargement of the heart. The patient expires despite intense supportive measures. At autopsy, microscopic examination of the myocardium discloses aggregates of mononuclear cells arranged around centrally located deposits of eosinophilic collagen. What is the appropriate diagnosis? (|Acute bacterial endocarditis (;Rheumatic heart disease (;Subacute bacterial endocarditis (;Systemic lupus erythematosus (;Viral myocarditi|1|Lama - Cardiovascular and Respiratory
+PATHM|A 53-year-old woman presents with a 6-week history of fever, fatigue, and weight loss. Her temperature is 38.7°C (103°F),pulse rate 110 per minute, and blood pressure 140/80 mm Hg.Physical examination reveals petechiae and clubbing of the fingers. The patient develops mental status changes, suffers a massive stroke, and expires. The mitral valve is examined at autopsy (shown in the image). Which of the following is the appropriate pathologic diagnosis? (|Bacterial endocarditis (;Carcinoid heart disease (;Libman-Sacks endocarditis (;Marantic endocarditis (;Mitral valve prolapse|0|Lama - Cardiovascular and Respiratory
+PATHM|47 A 72-year-old woman dies of congestive heart failure. The aortic valve is examined at autopsy (shown in the image). Which of the following is the most likely cause of aortic stenosis in this patient? (|Acute bacterial endocarditis (;Aging-related degeneration (;Chronic rheumatic valvulitis (;Congenital bicuspid valve (;Hypertrophic cardiomyopathy|1|Lama - Cardiovascular and Respiratory
+PATHM|All the following is true about aschoffs bodies except :|rheumatic lesions showing central fibrinoid necrosis;rheumatic lesions grossly seen as large , gray nodules;detected more commonly in the left myocardium than right side;can occur in other layers than myocardium|1|Lama - Cardiovascular and Respiratory
+PATHM|The enzyme which remains high for longer period in acute myocardial infarction is :|CK;SGOT;Troponin;LDH;Myoglobin|3|Lama - Cardiovascular and Respiratory
+PATHM|A woman delivered 3 days ago at home , brought to the hospital with confusion , high grade fever , tachycardia , blood pressure = 70/30 and multi organ failure The hemodynamic disturbance is :|hypovolemic shock;septic shock;deep vein thrombosis;pulmonary thromboembolism;anaphylactic shock|1|Lama - Cardiovascular and Respiratory
+PATHM|What are the characteristics of stable angina?|Chest pain that occurs with exertion and/or emotional stress;Severe and crushing chest pain (&gt,20 mins);Chest pain that occurs at rest;Bradycardia|0|Nosiba - Cardiology
+PATHM|What is the most commonly involved coronary artery in myocardial infarction (MI)?|Right coronary artery (RCA);Left anterior descending artery (LAD);Left circumflex artery (LCA);Posterior descending artery (PDA)|1|Nosiba - Cardiology
+PATHM|What gross histological change correlates with white blood cells’ (WBCs) invasion into cardiac tissue during the first week after an MI?|Yellow pallor;Dark discolouration;White scar;Red border around yellow pallor|3|Nosiba - Cardiology
+PATHM|Q4: What does the ECG show in prinzmetal angina?|ST segment elevation;ST segment depression;Absent P waves;Prolonged PR interval|0|Nosiba - Cardiology
+PATHM|Which of the following types of infection, precedes by several weeks, the development of acute rheumatic fever?|Group A β-hemolytic streptococcal infection of the pharynx;Group D α-hemolytic streptococcal infection of the heart;Staphylococcus aureus infection of the lungs;Streptococcus pyogenes infection of the skin;Treponema pallidum infection of the abdominal aorta|0|Rheumatic Fever
+PATHM|A 6-year-old boy develops fever, joint pain, and a diffuse skin rash approximately 3 weeks after recovering from a sore throat. Physical examination finds several small skin nodules, and laboratory examination finds an elevated erythrocyte sedimentation rate along with an elevated antistreptolysin O titer. Which of the following abnormalities is most characteristic of this boy’s disease?|Anitschkow cells within the epidermis;Aschoff bodies within the myocardium;Langhans giant cells within the dermis;Psammoma bodies within the endocardium;Virchow cells within the nasopharynx|1|Rheumatic Fever
+PATHM|A 44-year-old woman presents with worsening fatigue and dyspnea. The pertinent medical history is that she had rheumatic fever during childhood. Physical examination finds an early diastolic opening snap with a rumbling late diastolic murmur. A chest radiograph shows an enlarged left atrium. Which of the following is the most likely diagnosis?|Aortic regurgitation;Aortic stenosis;Mitral regurgitation;Mitral stenosis;Pulmonary stenosis|3|Rheumatic Fever
+PATHM|A 5-year-old white female has multiple bruises on her lower extremities and oral mucosal bleeding of 3 days' duration. Two weeks before these signs, she had a mild respiratory tract infection. Physical examination reveals multiple ecchymoses and petechiae; no lymphadenopathy or hepatosplenomegaly is noted. The next diagnostic step is|a complete blood count;a prothrombin time;a bleeding time;a partial thromboplastin time;an antinuclear antibody titer|0|Nosiba - Haematology
+PATHM|The most likely diagnosis for the condition described in Question 1 is|leukemia;neuroblastoma;aplastic anemia;idiopathic thrombocytopenia purpura;systemic lupus erythematosus|3|Nosiba - Haematology
+PATHM|Paresthesia, sensory ataxia, myopathy, subacute combined degeneration of spinal cord, optic neuropathy are characteristic of?|Vitamin B12 deficiency;Vitamin B6 deficiency;Vitamin B1 deficiency;Folate deficiency;Niacin deficiency|0|Nosiba - Haematology
+PATHM|Auer rod white blood cell on blood film is characteristic for?|AML;CML;ALL;CLL;Hodgkin lymphoma|0|Nosiba - Haematology
+PATHM|All of the following about multiple myeloma are true except?|It is a disease of elderly;Backache is a common symptom;renal failure can occur;The ESR is usually slightly elevated;Bence Jones protein is present in urine|3|Nosiba - Haematology
+PATHM|The commonest cause of epistaxis in young age is:|Rhinitis;Blood diseases;Hypertension;Congenital telangiectasia;Nasal tumors|0|Majid - ENT and Respiratory
+PATHM|The most important complication of tonsillitis is:|Enlarged cervical lymph nodes;Otitis media;Rheumatic fever;Quinzy;Fever|2|Majid - ENT and Respiratory
+PATHM|Squamous cell carcinoma of the vocal cords is characterised by all EXCEPT:|Slowly growing;Spreads only by lymphatics;Well-differentiated;Rather good prognosis;Sends late metastases|1|Majid - ENT and Respiratory
+PATHM|The inflammatory cellular infiltrate in bronchial asthma consists mainly of:|Lymphocytes;Plasma cells;Eosinophils;Polymorphs;Histiocytes|2|Majid - ENT and Respiratory
+PATHM|Complete bronchial obstruction leads to:|Emphysema;Alveolar collapse;Chronic bronchitis;Pneumonia;Bronchial asthma|1|Majid - ENT and Respiratory
+PATHM|Partial bronchial obstruction leads to:|Emphysema;Alveolar collapse;Chronic bronchitis;Pneumonia;Bronchial asthma|0|Majid - ENT and Respiratory
+PATHM|Suppurative lung diseases include all EXCEPT:|Bronchiectasis;Bronchial asthma;Lung abscess;Gangrene;Empyema|1|Majid - ENT and Respiratory
+PATHM|Inflammation in bronchopneumonia is:|Suppurative;Catarrhal;Fibrinous;Serous;Non-bacterial|0|Majid - ENT and Respiratory
+PATHM|Inflammation in lobar pneumonia is:|Suppurative;Catarrhal;Fibrinous;Serous;Non-bacterial|2|Majid - ENT and Respiratory
+PATHM|In viral pneumonia, the inflammatory infiltrate occurs in:|Alveolar lumen;Alveolar wall;Bronchial lumen;Bronchial wall;Interstitial tissue|4|Majid - ENT and Respiratory
+PATHM|The following is NOT a cause of lung abscess:|Pneumonia;Pyaemia;Bronchitis;Bronchogenic carcinoma;Infarction|2|Majid - ENT and Respiratory
+PATHM|A 4-year-old boy is admitted after developing haemarthrosis in his right knee while playing in the garden. Platelets 220 x10^9/l, PT 11 s, APTT 76 s, factor VIII activity normal. Most likely diagnosis?|Antithrombin III deficiency;Von Willebrand's disease;Antiphospholipid syndrome;Haemophilia A;Haemophilia B|4|Final Revision
+PATHM|A 30-year-old man has enlarged painless cervical lymph nodes; biopsy shows Hodgkin's lymphoma. Which type carries the best prognosis?|Lymphocyte predominant;Mixed cellularity;Nodular sclerosing;Hairy cell;Lymphocyte depleted|0|Final Revision
+PATHM|A 34-year-old HIV-positive man starts chemotherapy (cyclophosphamide, vincristine, methotrexate, prednisolone) for Burkitt's lymphoma. About 24 hours later he becomes confused and complains of muscle cramps in his legs. Most likely?|Prednisolone-induced psychosis;Hypercalcaemia;Methotrexate pneumonitis leading to hypoxia;Haemorrhagic cystitis leading to acute renal failure;Tumour lysis syndrome|4|Final Revision
+PATHM|A 12-year-old boy bleeds excessively during a dental extraction; petechial skin haemorrhages. Hb 12.3 g/dl, platelets 255 x10^9/l, WBC 7.9, PT 13.3 s, APTT 39 s, factor VIII activity 87%. Most likely diagnosis?|DIC;ITP;Von Willebrand's disease;Haemophilia A;Haemophilia B|2|Final Revision
+PATHM|A 52-year-old woman with hypothyroidism presents with lethargy and a sore tongue. Hb 10.7 g/dl, MCV 121 fl, platelets 177, WBC 5.4. Vitamin B12 64 ng/l (200-900), folic acid 7.2 nmol/l (above 3.0). Most appropriate management?|1 mg IM hydroxocobalamin once every 3 months;1 mg IM hydroxocobalamin 3 times each week for 2 weeks, then once every 3 months;1 mg IM hydroxocobalamin once every 2 months + folic acid 5 mg od;Folic acid 5 mg od for one week, then recheck bloods;1 mg IM hydroxocobalamin 3 times each week for 2 weeks, then once every 3 months + folic acid 5 mg od|1|Final Revision
+PATHM|A 42-year-old woman has Hb 17.8 g/dl. Which is LEAST likely to be the cause?|Polycythaemia rubra vera;Chronic obstructive pulmonary disease;Hypernephroma;Haemochromatosis;Dehydration|3|Final Revision
+PATHM|A 52-year-old man with anaemia and abdominal discomfort is diagnosed with chronic myeloid leukaemia. What is the mechanism of action of imatinib?|EGFR antagonist;Tyrosine kinase inhibitor;Anti-CD52 monoclonal antibody;Anti-CD23 monoclonal antibody;p53 inhibitor|1|Final Revision
+PATHM|A 21-year-old man had an abdominal ultrasound for episodic right upper quadrant pain showing gallstones. Hb 9.8 g/dl, MCV 91 fl, platelets 177, WBC 5.3. His father had a splenectomy at 30. Which test is most likely diagnostic?|Ham's test;PAS staining of erythrocytes;Glucose-6-phosphate dehydrogenase levels;Osmotic fragility test;Direct Coombs' test|3|Final Revision
+PATHM|A 33-year-old man with recurrent nosebleeds, iron-deficiency anaemia and dyspnoea is found to have a pulmonary AV malformation. Underlying diagnosis?|Haemophilia A;Hereditary haemorrhagic telangiectasia;Mantle cell lymphoma;Wegener's granulomatosis;Down's syndrome|1|Final Revision
+PATHM|Which is LEAST likely to cause a warm autoimmune haemolytic anaemia?|Mycoplasma infection;Methyldopa;Chronic lymphocytic leukaemia;Lymphoma;Systemic lupus erythematosus|0|Final Revision
+PATHM|Which of the following is a marker of a bad prognosis in acute lymphoblastic leukaemia?|Pre-B phenotype;Presentation in childhood;Initial white cell count of 18 x10^9/l;Female sex;Philadelphia chromosome positive|4|Final Revision
+#|PATHE|Bleeding Disorders|Acquired haemophilia;Antibiotic side effect;Complication of warfarin therapy;Congenital haemophilia;Disseminated intravascular coagulation;Global reduction in clotting factor synthesis;Heparin overdose;Hereditary haemorrhagic telangiectasia;Hypofibrinogenaemia;Pancytopenia;Thrombocytopenia;von Willebrand’s disease
+-|A 14-year-old boy being treated for meningococcal meningitis begins to bruise easily and bleed from his central line site and peripheral cannula. A full blood count shows a haemoglobin concentration of 9 g/dL, a platelet count of 90 × 10 9 /L and a white blood cell count of 16 × 10 9 /L. Coagulation studies reveal a prolonged prothrombin time (PT) and activated partial thromboplastin time (APTT), raised D- dimers and reduced fibrinogen levels.|4
+-|A 15-month-old boy is brought to the emergency department with a grossly swollen right knee. His parents claim that he has had several episodes of bleeding into his joints and muscles over the previous 6 months. A clotting screen was requested and showed a significantly prolonged APTT with a normal PT and bleeding time. The full blood count showed a mild microcytic anaemia.|3
+-|A 45-year-old woman complains of excessive bruising. She is known to have chronic hepatitis C infection. Her PT and APTT are slightly prolonged. The bleeding time is normal.|5
+-|A 75-year-old man presents to the emergency department following a minor head injury. On arrival, he is alert and orientated, but is later found in bed unresponsive, with a Glasgow Coma Scale score of 3. Fifteen minutes after an emergency set of blood tests has been sent, the laboratory calls to inform the duty doctor that the patient’s INR is above 8. When his wife arrives, she mentions that he is on some medication for an irregular heart beat and has recently started a course of antibiotics for a chest infection.|2
+-|A 13-year-old boy is brought to the emergency department with a nosebleed. His adoptive mother says that he has several episodes a month. On examination, he has a number of spidery, red lesions on his lips, tongue and fingers. A full blood count and clotting screen are both within normal limits.|7
+#|PATHE|Diabetic Emergencies|Decrease insulin dose temporarily;Increase insulin dose temporarily;Intravenous bicarbonate;Intravenous glucose;Intravenous glucagon;Intravenous insulin with fluid resuscitation;Oral glucose;Rectal diazepam;Subcutaneous insulin with fluid resuscitation;Urgent referral to an endocrinologist
+-|A 13-year-old boy is brought to the emergency department by his mother. He has been complaining of severe abdominal pain and thirst, and has been passing large volumes of urine. He is clinically dehydrated. Investigations show a plasma glucose concentration of 20 mmol/L, a potassium of 5.2 mmol/L, a sodium of 148 mmol/L, a urea of 13.4 mmol/Land a creatinine of 60 μmol/L. A blood gas shows a pH of 7.15, a Pco2 of 2.3 kPa, a Po2 of 13 kPa and a base excess of –7.|5
+-|A 68-year-old man is admitted to the emergency department with reduced consciousness. He has recently complained to his wife about passing large amounts of urine and excessive thirst. Investigation show a plasma blood glucose of 31.0 mmol/L, a potassium of 3.8 mmol/L, a sodium of 150 mmol/L, a urea of 16 mmol/L and a creatinine of 68 μmol/L.|5
+-|A 19-year-old woman with type 1 diabetes enters her GP’s surgery in a confused state. She appears anxious, pale and sweaty. The practice nurse manages to settle the patient and takes a capillary blood glucose reading, which gives a result of 2.0 mmol/L.|6
+-|A 22-year-old woman who has been newly diagnosed with type 1 diabetes begins to fit in the outpatient waiting room. She appears pale and clammy. After securing her airway and starting intravenous fluids, the nurse requests a capillary blood glucose, which shows a level of &lt;1.0 mmol/L.|3
+-|The mother of a 14-year-old type 1 diabetic boy phones the GP’s surgery asking for advice. Her son has a chest infection and is not eating. She is worried about his blood sugar levels.|1
+#|PATHE|Hepatitis B Serology|α-fetoprotein;Alanine aminotransferase;Hepatitis B core antibody (HBcAb);Hepatitis B core antigen (HBcAg);Hepatitis B e antigen (HBeAg);Hepatitis B surface antibody (HBsAb);Hepatitis B surface antigen (HBsAg);Hepatitis B RNA titre
+-|This serological marker is used to measure immunity following hepatitis B immunization.|5
+-|This serological marker is the first to indicate acute hepatitis B infection.|6
+-|This serological marker would indicate chronic hepatitis B infection if detected 6 months after the original infection.|6
+-|This serological marker indicates high infectivity in a chronic hepatitis B carrier.|4
+-|This serological marker, if high, would indicate low infectivity in a chronic hepatitis B carrier.|5
+#|PATHE|Interpretation of Liver Function Tests|Acute liver failure;Biliary tract obstruction;Gilbert’s syndrome;Haemolytic anaemia;Hepatocellular carcinoma;Hepatocellular inflammation;Paracetamol overdose;Short-term alcohol abuse
+-|An 18-year-old man has routine blood tests taken as part of a medical trial. A mildly raised bilirubin level was incidentally discovered. The man is asymptomatic and is usually fit and well.|2
+-|A 45-year-old woman presents to the emergency department with severe right upper quadrant abdominal pain. She is found to have significantly raised alkaline phosphatase and bilirubin levels. Alanine transaminase (ALT) and aspartate transaminase (AST) are only mildly raised.|1
+-|A 19-year-old man is shown to have a raised γ- glutamyltranspeptidase level after he is admitted to the emergency department following an alcohol binge. Liver function tests, full blood count, and urea and electrolytes are all normal.|7
+-|A 56-year-old man presents to the GP with abdominal pain and jaundice. His liver function tests are globally deranged. ALT and AST levels are significantly raised, and there is a mild rise in bilirubin and alkaline phosphatase.|5
+-|A 45-year-old man presents to the emergency department with confusion, lethargy and jaundice. His stools and urine are a normal colour. Blood tests show a raised unconjugated bilirubin, a raised lactate dehydrogenase, a raised ALT and a haemoglobin (Hb) concentration of 8.1 g/dL. Alkaline phosphatase, ALT and AST levels are normal.|3
+#|PATHE|Anaemia|α-Thalassaemia;β-Thalassaemia major;β-Thalassaemia trait;Anaemia of chronic disease;Autoimmune haemolytic anaemia;Glucose-6-phosphate dehydrogenase deficiency;Hereditary spherocytosis;Iron-deficiency anaemia secondary to gastrointestinal bleeding;Iron-deficiency anaemia secondary to iron malabsorption;Iron-deficiency anaemia secondary to menorrhagia;Megaloblastic macrocytic anaemia secondary to vitamin B12 deficiency;Megaloblastic macrocytic anaemia secondary to folate deficiency;Megaloblastic microcytic anaemia secondary to vitamin B12 deficiency;Normal variant;Sickle cell anaemia
+-|A 68-year-old woman who is being investigated for altered bowel habit is found to have an Hb concentration of 8.3 g/dL, an MCV of 67 fL, a low ferritin level and a raised total iron-binding capacity.|7
+-|A 24-year-old woman with active Crohn’s disease is shown to have an Hb concentration of 9.5 g/dL, an MCV of 101 fL and a normal ferritin level. A peripheral blood film shows a number of hypersegmented neutrophils.|10
+-|A 55-year-old woman with a long history of rheumatoid arthritis is shown to have an Hb concentration of 10.5 g/dL, an MCV of 80 fL and a raised ferritin level. Her arthritis is treated only symptomatically with paracetamol.|3
+-|A previously well 8-month-old baby boy becomes generally unwell. His health visitor notices that he is failing to thrive. Investigation shows a microcytic, hypochromic anaemia in association with high levels of HbF and HbA2 .|1
+-|A 56-year-old man presents to the emergency department feeling generally unwell and complaining of palpitations and breathlessness. He is clearly jaundiced on examination. Apart from hypertension, there is no significant medical history. The full blood count reveals an Hb concentration of 7.4 g/dL, an MCV of 95 fL and a normal ferritin level. The peripheral blood film shows a larger than expected number of reticulocytes. Coombs’ test is later shown to be positive.|4
+#|PATHE|Diagnosis of Haematological Disease|Chronic myeloid leukaemia;Dehydration;Essential thrombocythaemia;Hodgkin’s lymphoma;Monoclonal gammopathy of uncertain significance;Multiple myeloma;Myelofibrosis;Non-Hodgkin’s lymphoma;Osteoporosis;Polycythaemia rubra vera;Secondary polycythaemia;Waldenström’s macroglobulinaemia
+-|A 74-year-old man is being investigated following a crush fracture of his T8 vertebra. He is found to have a monoclonal band on serum electrophoresis and free Ig light chains in his urine.|5
+-|A 25-year-old man presents to his GP complaining of a mass in his neck. The mass is generally painless, although it occasionally aches after alcohol. He admits to losing a significant amount of weight over the last month and also complains of excessive sweating and general itching. A biopsy of the mass reveals the presence of Reed– Sternberg cells.|3
+-|A 74-year-old woman presents to her GP complaining of headaches and itching that is much worse after a warm bath. On examination, she has a normal cardiovascular and respiratory system. While palpating the abdomen, the doctor feels a vague fullness in the left upper quadrant. A full blood count shows an Hb concentration of 22.1 g/dL.|9
+-|A 65-year-old man on long-term oxygen therapy for chronic obstructive pulmonary disease is found to have an Hb concentration of 18.4 g/dL.|10
+-|An 83-year-old man is referred for bone marrow aspiration after presenting with hepatomegaly, splenomegaly and pancytopenia. No marrow could be aspirated during the first attempt. A trephine biopsy is successfully performed, and histology reveals hypercellular marrow containing many abnormal megakaryocytes.|6
+#|PATHE|Investigation of Liver Disease|α1 -Antitrypsin level;α-Fetoprotein;Antimitochondrial antibody;Antinuclear antibodies;Ceruloplasmin level;Cytomegalovirus PCR;Hepatitis A antigen;Hepatitis A IgG;Hepatitis A IgM;Hepatitis C RNA;Hepatitis C antibody;Total iron-binding capacity
+-|A 12-year-old girl presents with jaundice. Her mother says that she has been behaving differently over the last few weeks. Investigation shows deranged liver function tests, and an ultrasound scan confirms cirrhotic changes within the liver.|4
+-|A 34-year-old man presents with a 1-month history of vague upper abdominal pain. He is on insulin for diabetes, but is otherwise well. On examination, there appears to be a bronzed tan to the skin, although the patient denies having been on holiday.|11
+-|A 42-year-old woman presents with a 4-week history of generalized itching. She has developed yellow lesions in the skin around her eyes. Blood tests reveal deranged liver function tests.|2
+-|A 32-year-old man has recently returned from holiday in India, where he stayed with locals and dined with them. Two weeks later, he presents with jaundice and lethargy. Liver function tests reveal a massively raised ALT and a significantly raised bilirubin.|8
+-|A 27-year-old nurse sustained a needlestick injury 4 months ago. She attends an occupational health appointment, where a blood test is done to exclude hepatitis C|9
+#|PATHE|Gastrointestinal Radiology|Achalasia;Crohn’s disease;Hiatus hernia;Ischaemic colitis;Oesophageal spasm;Oesophagitis;Pancreatitis;Primary sclerosing cholangitis;Toxic megacolon;Ulcerative colitis;Visceral perforation
+-|A 56-year-old man presents with severe upper abdominal pain. A chest X-ray shows free air under the right hemidiaphragm.|10
+-|A 47-year-old woman presents with a short history of difficulty swallowing and intermittent regurgitation. On a barium swallow study, she is shown to have a proximally dilated oesophagus that tapers distally.|0
+-|A 65-year-old woman is admitted with worsening shortness of breath and sputum production. A chest X-ray shows an air– fluid level behind her heart, but no evidence of consolidation.|2
+-|A 51-year-old man presents with acute abdominal pain and bloodstained diarrhoea. An abdominal X-ray reveals a 12 cm dilatation of his transverse colon with colonic wall thickening.|8
+-|During endoscopic retrograde cholangiopancreatography, a 45-year-old man with ulcerative colitis and jaundice is found to have multiple strictures throughout his common bile duct and biliary tree.|7
+#|PATHE|Jaundice|Autoimmune hepatitis;Bacterial hepatitis;Common bile duct stone;Gilbert’s syndrome;Haemolysis;Hepatic metastases;Opiate overdose;Pancreatic carcinoma;Paracetamol intoxication;Viral hepatitis
+-|A 58-year-old man presents to his GP with a 4- week history of worsening jaundice that is associated with dark urine and pale stools. He denies any pain, but has lost a stone in weight over the last month. There is no history of foreign travel, intravenous drug use or sexual activity with prostitutes.|7
+-|A 40-year-old woman presents to the emergency department with severe right upper quadrant pain, vomiting and jaundice. She has had similar pains in the past that were triggered by fatty food.|2
+-|A 67-year-old man presents to his GP with jaundice. On further questioning, he admits to a 5-month history of diarrhoea, bleeding per rectum and weight loss. On examination, the liver is palpable 4 cm below the costal margin and has an uneven border.|5
+-|A 28-year-old woman presents to the emergency department with a 2-month history of lethargy, abdominal pain and jaundice. On further questioning, she admits to using intravenous drugs.|9
+-|A 16-year-old girl presents to the emergency department complaining of severe lethargy, jaundice and bruising. On further questioning, she admits having taken 30 co-codamol tablets 72 hours ago. After ‘sleeping off’ the overdose, she initially felt well and did not seek medical attention.|8
+#|PATHE|Signs of Liver Disease|Asterixis;Caput medusa;Cirrhosis;Constructional apraxia;Dupuytren’s contracture;Hepatomegaly;Jaundice;Kaiser–Fleischer rings;Leukonychia;Palmar erythema;Spider naevi;Xanthelasma
+-|A 64-year-old woman with a long history of alcohol abuse presents to her GP because she cannot fully extend the ring and little fingers on her left hand. Since her fingers are permanently partially flexed, she can no longer place her hand flat on a flat surface.|4
+-|A 55-year-old man with cirrhosis secondary to alcoholic liver disease presents to the emergency department in a confused state. When asked to hold his arms outstretched with his hands cocked back, his wrists begin to jerk in a flexion– extension motion.|0
+-|A 34-year-old man who is being investigated for jaundice is shown to have a smooth mass in his right upper quadrant. The mass is palpable 4 cm below the costal margin and moves down with respiration.|5
+-|A 12-year-old girl being investigated for cirrhosis and behavioural changes is shown to have a green–yellow discoloration around her iris on slit-lamp examination.|7
+-|A 57-year-old man with ascites and cirrhosis of the liver is noted to have distended veins around his umbilicus.|1
+#|PATHE|Haematological Malignancy|Acute lymphoblastic leukaemia;Acute myeloid leukaemia;Burkitt’s lymphoma;Chronic lymphocytic leukaemia;Chronic myeloid leukaemia;Disseminated intravascular coagulation;Hodgkin’s lymphoma;Myelofibrosis;Myeloma;Neutrocytosis;Neutropenic sepsis;Non-Hodgkin’s lymphoma;Tumour lysis syndrome
+-|A 9-year-old boy is brought to the GP by his mother, who feels that he is very lethargic and bruises easily. The doctor requested a full blood count, which showed a haemoglobin concentration of 9.3 g/dL, a white cell count of 80 × 10 9 /L and a platelet count of 30 × 10 9 /L.|0
+-|A 2-year-old girl with Down’s syndrome becomes generally unwell and develops multiple bruises during a 3-day illness. Blood tests show a haemoglobin concentration of 6.8 g/dL, a white cell count of 60 × 10 9 /L and a platelet count of 10 × 10 9 /L. Auer rods can be seen in blast cells on microscopy.|1
+-|A 74-year-old man complains of a 6-month history of lethargy, itching and severe abdominal discomfort. On examination, the doctor notices several areas of bruising on the skin and what he thinks to be an enlarged spleen on palpation of the abdomen. A full blood count shows a white cell count of 100 ×10 9 /L. He is later shown to possess the Philadelphia chromosome.|4
+-|A 12-year-old girl receiving chemotherapy for acute lymphoblastic leukaemia becomes generally unwell on the ward. She complains of pins and needles around her lips and spasms in her hands and feet. Her urine output has also significantly decreased. Blood tests show that she is hyperkalaemic, hyperphosphataemic, hyperuricaemic and hypocalcaemic.|12
+-|A 5-year-old-girl becomes febrile, hypotensive and tachycardic 1 week after receiving induction chemotherapy for an acute leukaemia. The full blood count shows a haemoglobin concentration of 8.9 g/dL, a white cell count of 0.5 × 10 9 /L, aplatelet count of 60 × 10 9 /L and a neutrophil count of 0.1 × 10 9 /L.|10
+#|PATHE|Signs in Gastrointestinal Disease|Angular stomatitis;Dermatitis herpetiformis;Episcleritis;Erythema multiform;Erythema nodosum;Leukoplakia;Pyoderma gangrenosum;Sister Joseph nodule;Virchow’s node
+-|A 65-year-old woman with a history of dyspepsia and significant weight loss is noticed to have a 2-cm mass above her left clavicle.|8
+-|A 17-year-old man with Crohn’s disease presents to his GP with a lesion on his left shin. It began as a pustule, which became erythematous and ulcerated with time. The ulcer is deep, and the edges are well demarcated and have a blue tinge.|6
+-|A 34-year-old man with active ulcerative colitis presents to his GP complaining of several painful red lesions on his shins. On examination, there are multiple, purple, tender, macular lesions on both shins.|4
+-|A 56-year-old woman who is being investigated for a gastrointestinal cause of iron- deficiency anaemia is noticed to have fissures in each corner of her mouth.|0
+-|A 37-year-old woman with coeliac disease develops an intensely itchy blistering rash on her wrists and forearms.|1
+#|PATHE|Non-infective Diarrhoea|Coeliac disease;Irritable bowel syndrome;Laxative abuse;Medication side-effect;Overflow diarrhoea;Pancreatitis;Thyrotoxicosis;Ulcerative colitis;Zollinger–Ellison syndrome
+-|A 19-year-old woman presents to the GP with a 4-week history of diarrhoea. She also mentions that she is constantly hot and experiences occasional palpitations. She has unintentionally lost half a stone (3 kg) in weight in the last month.|6
+-|A 46-year-old man presents with a history of sudden-onset diarrhoea, abdominal pain and fever. The patient says that his stool was very loose and mixed with significant amounts of frank blood.|7
+-|A 14-year-old girl is brought to the GP by her mother, who says that her daughter has been ‘going to the toilet’ up to six times per day over the last month. On examination, the girl is underweight for her height and has downy hair on her face and arms. There are scratches on the knuckles of her right hand.|2
+-|A 27-year-old woman presents to her GP complaining of a long history of abdominal cramps associated with alternating diarrhoea and constipation. Abdominal examination is unremarkable.|1
+-|An 80-year-old woman who is cared for in a nursing home is noticed to be passing watery diarrhoea despite the fact that she is known to be chronically constipated and faecally impacted.|4
+#|PATHE|Complications of Liver Disease|Clotting factor deficiency;Hepatic encephalopathy;Hepatorenal syndrome;Hypoalbuminaemia;Hypoglycaemia;Lower gastrointestinal bleed;Ruptured oesophagus;Seizure;Spontaneous bacterial peritonitis;Thrombocytopenia;Upper gastrointestinal bleed
+-|A 56-year-old man with ascites secondary to alcoholic liver disease presents to the emergency department with severe abdominal pain and fever.|8
+-|A 42-year-old woman with cirrhosis secondary to chronic hepatitis C infection presents to the emergency department with a history of vomiting frank blood and passing offensive, black stools.|10
+-|A 36-year-old man with alcoholic liver disease is noticed to be increasingly confused, clumsy and aggressive after an upper gastrointestinal bleed. He is now sleeping during the day and is awake atnighttime.|1
+-|A 54-year-old woman with end-stage liver failure secondary to primary biliary cirrhosis is noticed to have a rising serum creatinine and urea and is passing only small volumes of urine each day.|2
+-|A 19-year-old woman took a significant overdose of paracetamol 2 days ago. She has noticed several large bruises on her limbs and trunk.|0
+`;
+const SY={GEN:'General Pharmacology',ANS:'Autonomic Pharmacology',RESP:'Respiratory',PAIN:'NSAIDs, Steroids & Analgesia',TOX:'Toxicology',GU:'Urinary & Ocular',PATHM:'Pathology · MCQs',PATHE:'Pathology · EMQs'};
+const Q=[];let th;
+T.trim().split('\n').filter(l=>l.trim()).forEach(l=>{const p=l.split('|');
+if(p[0]=='#')th={s:p[1],t:p[2],o:p[3].split(';')};
+else if(p[0]=='-')Q.push({s:th.s,q:p[1],o:th.o,a:+p[2],e:'EMQ · '+th.t});
+else Q.push({s:p[0],q:p[1],o:p[2].split(';'),a:+p[3],e:p[4]})});
+let D={h:[],w:{}};try{D=JSON.parse(localStorage.getItem('afraa'))||D}catch(e){}
+const sv=()=>{try{localStorage.setItem('afraa',JSON.stringify(D))}catch(e){}};
+const $=document.getElementById('app'),L='ABCDEFGHIJKLMNO';
+let ac;function snd(ok){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const t=ac.currentTime;(ok?[660,880]:[200,140]).forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=ok?'sine':'sawtooth';o.frequency.value=f;g.gain.setValueAtTime(.15,t+i*.12);g.gain.exponentialRampToValueAtTime(.001,t+i*.12+.22);o.connect(g);g.connect(ac.destination);o.start(t+i*.12);o.stop(t+i*.12+.25)})}catch(e){}}
+function theme(){const r=document.documentElement,d=r.dataset.theme?r.dataset.theme=='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=d?'light':'dark'}
+const hd=()=>`<header><div><h1>Afraa <span>Pharma</span></h1><div class="sub">Pharmacology Question Bank · ${Q.length} questions</div></div><button class="ic" onclick="theme()">◐ Theme</button></header>`;
+function home(){const W=Object.keys(D.w).length,H=D.h,avg=H.length?Math.round(H.reduce((a,b)=>a+b.p,0)/H.length):0,best=H.length?Math.max(...H.map(x=>x.p)):0;
+$.innerHTML=hd()+`<div class="st"><div><b>${H.length}</b>Quizzes</div><div><b>${avg}%</b>Average</div><div><b>${best}%</b>Best</div></div>
+<div class="grid">`+Object.keys(SY).map(k=>{const n=Q.filter(q=>q.s==k).length;return `<button class="sys" onclick="start('${k}')"><b>${SY[k]}</b><small>${n} questions</small></button>`}).join('')+
+`<button class="sys" onclick="start('EXAM')" style="border-color:var(--ac)"><b>Random Exam</b><small>100 random questions · score out of 100</small></button><button class="sys" onclick="start('ALL')"><b>All Systems</b><small>${Q.length} questions · shuffled</small></button>
+<button class="sys" onclick="start('WRONG')" style="border-color:var(--no)"><b>Review Mistakes</b><small>${W} to correct</small></button></div>
+<div class="card" style="margin-top:12px"><b>Recent scores</b>`+(H.slice(-6).reverse().map(x=>`<div class="hi">${x.n} — <em>${x.c}/${x.t} (${x.p}%)</em> <span class="sub">${x.d}</span></div>`).join('')||'<div class="sub">No attempts yet.</div>')+`</div>
+<button class="ic" onclick="if(confirm('Reset all progress?')){D={h:[],w:{}};sv();home()}">Reset progress</button>`}
+let R;
+function start(k){let ids=Q.map((_,i)=>i).filter(i=>k=='ALL'||k=='EXAM'||(k=='WRONG'?D.w[i]:Q[i].s==k));
+if(!ids.length){alert('Nothing to review yet — great job!');return}
+ids.sort(()=>Math.random()-.5);if(k=='EXAM')ids=ids.slice(0,100);R={k,ids,i:0,c:0,m:[],ex:k=='EXAM',n:k=='EXAM'?'Random Exam':k=='ALL'?'All Systems':k=='WRONG'?'Mistakes Review':SY[k]};show()}
+function show(){const q=Q[R.ids[R.i]];
+$.innerHTML=hd()+`<div class="sub">${R.n} · ${R.i+1}/${R.ids.length} ${R.ex?'':' · Score '+R.c}</div><div class="bar"><i style="width:${R.i/R.ids.length*100}%"></i></div>
+<div class="card"><span class="tag">${SY[q.s]}${q.e?' · '+q.e:''}</span><p class="q">${q.q}</p>`+q.o.map((o,j)=>`<button class="o" onclick="ans(${j},this)"><b>${L[j]}.</b> ${o}</button>`).join('')+`<div class="row" id="nx"></div></div><button class="ic" onclick="home()">← Exit</button>`}
+function pk(j){const id=R.ids[R.i],q=Q[id];document.querySelectorAll('.o').forEach(x=>x.disabled=true);if(j==q.a){R.c++;delete D.w[id]}else{R.m.push(id);D.w[id]=1}sv();setTimeout(nxt,200)}
+function ans(j,b){if(R.ex){b.style.borderColor='var(--ac)';return pk(j)}const id=R.ids[R.i],q=Q[id],bs=document.querySelectorAll('.o');bs.forEach(x=>x.disabled=true);
+const ok=j==q.a;bs[q.a].classList.add('ok');if(!ok){b.classList.add('no');R.m.push(id);D.w[id]=1}else{R.c++;delete D.w[id]}
+snd(ok);sv();document.getElementById('nx').innerHTML=`<div style="width:100%;font-weight:600;color:var(${ok?'--ok':'--no'})">${ok?'Correct ✓':'Incorrect ✗ — Model answer: '+L[q.a]+'. '+q.o[q.a]}</div><button class="pr" onclick="nxt()">${R.i+1<R.ids.length?'Next →':'Finish'}</button>`}
+function nxt(){R.i++;R.i<R.ids.length?show():fin()}
+function fin(){const t=R.ids.length,p=Math.round(R.c/t*100);if(R.ex)snd(p>=50);D.h.push({n:R.n,c:R.c,t,p,d:new Date().toLocaleDateString('en-GB')});sv();
+$.innerHTML=hd()+`<div class="card"><div class="big">${R.ex?R.c+' / '+t:p+'%'}</div><p style="text-align:center">${R.c} of ${t} correct</p></div>`+(R.m.length?`<div class="card"><b>Mistakes to review</b>`+R.m.map(i=>`<div class="hi">${Q[i].q}<br><em>${L[Q[i].a]}. ${Q[i].o[Q[i].a]}</em></div>`).join('')+`</div>`:'')+`<div class="row"><button class="pr" onclick="home()">Home</button>${R.m.length?`<button class="ic" onclick="start('WRONG')">Correct my mistakes</button>`:''}</div>`}
+home();
+</script></body></html>
